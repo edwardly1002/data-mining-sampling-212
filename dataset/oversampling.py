@@ -1,0 +1,43 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import StratifiedKFold,train_test_split
+from imblearn.over_sampling import RandomOverSampler, SMOTE
+from sklearn.preprocessing import StandardScaler
+
+DATASET = "./creditcard.csv"
+RESULTDIR= "./oversampling/"
+
+
+
+class Method:
+    RANDOM = RandomOverSampler
+    SYNTHETIC= SMOTE
+
+def get_oversampled_dataset(strategy, X, y):
+    return strategy.fit_resample(X, y)
+
+if __name__ =="__main__":
+    df = pd.read_csv(DATASET)
+    
+    # SSK or train_test_split
+    eps=0.01
+    df['Amount'] = StandardScaler.fit_transform(df['Amount'].values.reshape(-1,1))
+    df['Time'] = StandardScaler.fit_transform(df['Time'].values.reshape(-1,1))
+
+    train_df, test_df = train_test_split(df, test_size=0.2)
+    train_df, val_df = train_test_split(train_df, test_size=0.2)
+    train_features = np.array(train_df)
+    
+    # drop class 
+    train_labels = np.array(train_df.pop('Class'))
+    val_labels = np.array(val_df.pop('Class'))
+    test_labels = np.array(test_df.pop('Class'))
+    
+    train_features = np.array(train_df)
+    val_features = np.array(val_df)
+    test_features = np.array(test_df)
+    train_features, train_labels = \
+        get_oversampled_dataset(Method.RANDOM, train_df, train_labels)
+    
+    # test to file log
+    # print(train_features,train_labels)
