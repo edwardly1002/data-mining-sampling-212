@@ -6,7 +6,7 @@ from tensorflow.keras import layers
 
 class SimpleCNN(keras.Model):
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.Preprocess = lambda x: tf.expand_dims(x, axis=3)
         self.Reshape = layers.Reshape((5,6), input_shape=(30, ))
         self.CNNs = [

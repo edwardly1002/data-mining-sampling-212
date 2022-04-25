@@ -8,12 +8,12 @@ DATASET = "../data/creditcard_2000.csv"
 RESULTDIR= "./oversampling/"
 
 
-
-class Method:
+class OversampleMethod:
     RANDOM = RandomOverSampler()
     SYNTHETIC= SMOTE()
 
-def get_oversampled_dataset(strategy, X, y):
+
+def oversample_with(strategy, X, y):
     return strategy.fit_resample(X, y)
 
 if __name__ =="__main__":
@@ -36,7 +36,7 @@ if __name__ =="__main__":
     val_features = np.array(val_df)
     test_features = np.array(test_df)
     train_features=StandardScaler().fit_transform(train_features)
-    train_features, train_labels = get_oversampled_dataset(Method.SYNTHETIC, train_df, train_labels)
+    train_features, train_labels = oversample_with(OversampleMethod.SYNTHETIC, train_df, train_labels)
     
     # test to file log
     print(train_features,train_labels)

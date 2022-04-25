@@ -1,4 +1,5 @@
 from dataset import *
+from dataset.dataset import get_balanced_dataset, process_dataset
 from model.SimpleCNN import SimpleCNN
 
 import tensorflow as tf
@@ -6,6 +7,11 @@ from config import *
 
 def main():
     ### STEP 1: PREPARE DATASET
+    train_features, train_labels, \
+    val_features, val_labels, \
+    test_features, test_labels = process_dataset(DATASET_URL)
+    train_features, train_labels = get_balanced_dataset(train_features, train_labels, oversample=True)
+
     train_dataset = (
         tf.data.Dataset.from_generator(
             ### generator, 
