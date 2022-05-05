@@ -19,7 +19,7 @@ def process_dataset(dataset, test_ratio=0.2, val_ratio=0.2, min_clip=-5, max_cli
     df['Log Time'] = np.log(df.pop('Time') + eps)
     df['Log Amount'] = np.log(df.pop('Amount') + eps)
     
-    val_features, val_labels = None
+    val_features, val_labels = None, None
 
     train_df, test_df = train_test_split(df, test_size=test_ratio)
     if val_ratio:
