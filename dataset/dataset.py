@@ -6,7 +6,7 @@ import numpy as np
 from .under_sampling import UndersampleMethod, undersample_with
 from .oversampling import OversampleMethod, oversample_with
 
-def process_dataset(dataset):
+def process_dataset(dataset, test_ratio=0.2, val_ratio=0.2, min_clip=-5, max_clip=5):
     df = pd.read_csv(dataset)
 
     # neg, pos = np.bincount(df['Class'])
@@ -18,16 +18,21 @@ def process_dataset(dataset):
     eps = 0.001
     df['Log Time'] = np.log(df.pop('Time') + eps)
     df['Log Amount'] = np.log(df.pop('Amount') + eps)
+    
+    val_features, val_labels = None, None
 
-    train_df, test_df = train_test_split(df, test_size=0.2)
-    train_df, val_df = train_test_split(train_df, test_size=0.2)
+    train_df, test_df = train_test_split(df, test_size=test_ratio)
+    if val_ratio:
+        train_df, val_df = train_test_split(train_df, test_size=val_ratio)
 
     train_labels = np.array(train_df.pop('Class'))
-    val_labels = np.array(val_df.pop('Class'))
+    if val_ratio:
+        val_labels = np.array(val_df.pop('Class'))
     test_labels = np.array(test_df.pop('Class'))
 
     train_features = np.array(train_df)
-    val_features = np.array(val_df)
+    if val_ratio:
+        val_features = np.array(val_df)
     test_features = np.array(test_df)
 
     # print('Training labels shape:', train_labels.shape)
@@ -39,12 +44,14 @@ def process_dataset(dataset):
 
     scaler = StandardScaler()
     train_features = scaler.fit_transform(train_features)
-    val_features = scaler.transform(val_features)
+    if val_ratio:
+        val_features = scaler.transform(val_features)
     test_features = scaler.transform(test_features)
 
-    train_features = np.clip(train_features, -5, 5)
-    val_features = np.clip(val_features, -5, 5)
-    test_features = np.clip(test_features, -5, 5)
+    train_features = np.clip(train_features, min_clip, max_clip)
+    if val_ratio:
+        val_features = np.clip(val_features, min_clip, max_clip)
+    test_features = np.clip(test_features, min_clip, max_clip)
 
     return train_features, train_labels, val_features, val_labels, test_features, test_labels
 
