@@ -6,7 +6,7 @@ import numpy as np
 from .under_sampling import UndersampleMethod, undersample_with
 from .oversampling import OversampleMethod, oversample_with
 
-def process_dataset(dataset):
+def process_dataset(dataset, test_ratio=0.2, val_ratio=0.2, min_clip=-5, max_clip=5):
     df = pd.read_csv(dataset)
 
     # neg, pos = np.bincount(df['Class'])
@@ -19,8 +19,8 @@ def process_dataset(dataset):
     df['Log Time'] = np.log(df.pop('Time') + eps)
     df['Log Amount'] = np.log(df.pop('Amount') + eps)
 
-    train_df, test_df = train_test_split(df, test_size=0.2)
-    train_df, val_df = train_test_split(train_df, test_size=0.2)
+    train_df, test_df = train_test_split(df, test_size=test_ratio)
+    train_df, val_df = train_test_split(train_df, test_size=val_ratio)
 
     train_labels = np.array(train_df.pop('Class'))
     val_labels = np.array(val_df.pop('Class'))
@@ -42,9 +42,9 @@ def process_dataset(dataset):
     val_features = scaler.transform(val_features)
     test_features = scaler.transform(test_features)
 
-    train_features = np.clip(train_features, -5, 5)
-    val_features = np.clip(val_features, -5, 5)
-    test_features = np.clip(test_features, -5, 5)
+    train_features = np.clip(train_features, min_clip, max_clip)
+    val_features = np.clip(val_features, min_clip, max_clip)
+    test_features = np.clip(test_features, min_clip, max_clip)
 
     return train_features, train_labels, val_features, val_labels, test_features, test_labels
 
