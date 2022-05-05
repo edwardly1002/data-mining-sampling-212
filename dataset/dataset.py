@@ -53,13 +53,13 @@ def process_dataset(dataset, test_ratio=0.2, val_ratio=0.2, min_clip=-5, max_cli
         val_features = np.clip(val_features, min_clip, max_clip)
     test_features = np.clip(test_features, min_clip, max_clip)
 
-    return train_features, train_labels, val_features, val_labels, test_features, test_labels
+    return (train_features, train_labels), (val_features, val_labels), (test_features, test_labels)
 
 
 def get_balanced_dataset(train_features, train_labels, oversample=True):
     return \
         oversample_with(OversampleMethod.SYNTHETIC, train_features, train_labels) if oversample else \
-        undersample_with(UndersampleMethod.CONDENSED, train_features, train_labels)
+        undersample_with(UndersampleMethod.TOMEK, train_features, train_labels)
 
 
 def _print_sampling_stat(train_features, train_labels):
