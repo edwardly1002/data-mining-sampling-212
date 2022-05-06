@@ -15,15 +15,17 @@ import numpy as np
 import seaborn as sns
 
 
+import tensorflow.keras.backend as K
+
 from config import *
 
 LOG_DIR='origin_ANN_sequential.log'
 
 def main():
     ### STEP 1: PREPARE DATASET
-    train_features, train_labels, \
-    val_features, val_labels, \
-    test_features, test_labels = process_dataset(DATASET_DIR or DATASET_URL)
+    (train_features, train_labels), \
+    (val_features, val_labels), \
+    (test_features, test_labels) = process_dataset(DATASET_DIR or DATASET_URL)
     log('Complete preparing dataset.')
 
     ### STEP 2: Build model
@@ -41,12 +43,12 @@ def main():
     model.compile(
         optimizer=Adam(),
         loss='binary_crossentropy', 
-        metrics = ['accuracy', Precision(), Recall()]
+        metrics = ['accuracy', Precision(), Recall(), F1Score(num_classes=1, threshold=0.5)]
     )
     
     model_checkpoint_callback=tf.keras.callbacks.ModelCheckpoint(
         CKPT_DIR,
-        monitor='val_accuracy',
+        monitor='val_f1_score',
         verbose=1,
         save_best_only=True,
         save_weights_only=False,
@@ -55,7 +57,7 @@ def main():
     )
     
     early_stopping = tf.keras.callbacks.EarlyStopping(
-        monitor='val_accuracy',
+        monitor='val_f1_score',
         min_delta=1e-4,
         patience=10,
         verbose=1,
